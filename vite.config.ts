@@ -18,6 +18,7 @@ export default defineConfig({
     api: 7001,
   },
   // Backwards-compat with Gatsby.
+  base: '/admin',
   publicDir: "static",
   build: {
     outDir: "public",
