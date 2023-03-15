@@ -35,6 +35,7 @@ const Select = forwardRef(
     const containerRef = useRef<HTMLDivElement>(null)
 
     const { portalRef } = useContext(ModalContext)
+    console.log(selectProps)
 
     return (
       <AdjacentContainer
