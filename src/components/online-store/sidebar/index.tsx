@@ -11,13 +11,13 @@ export const OnlineStoreSidebar = (props: {}) => {
     currentPage,
     setCurrentPage,
   } = useOnlineStore()
-  const NextSelect_Options = pages.map((page)=>{
+  const nextSelectOptions = pages.map((page)=>{
     return {
       label : page.name,
       value: page.path
     }
   })
-  const NextSelect_currentPage = {
+  const nextSelectCurrentPage = {
     label: currentPage.name,
     value: currentPage.path
   }
@@ -37,8 +37,8 @@ export const OnlineStoreSidebar = (props: {}) => {
         onChange={(e: any) => {
           setCurrentPage({path: e.value, name: e.label})
         }}
-        options={NextSelect_Options}
-        value={NextSelect_currentPage}
+        options={nextSelectOptions}
+        value={nextSelectCurrentPage}
         placeholder="Choose a collection"
         isClearable
       />

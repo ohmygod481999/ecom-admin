@@ -4,10 +4,11 @@ import Sidebar from "../organisms/sidebar"
 import Topbar from "../organisms/topbar"
 import { PollingProvider } from "../../context/polling"
 import { OnlineStoreSidebar } from "../online-store/sidebar"
+import { OnlineStoreHeader } from "../online-store/header"
 
 const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
-    <div className="flex w-full h-screen inter-base-regular text-grey-90">
+    <div className="flex flex-col w-full h-screen inter-base-regular text-grey-90">
       <Toaster
         containerStyle={{
           top: 74,
@@ -16,17 +17,21 @@ const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
           right: 24,
         }}
       />
-      <OnlineStoreSidebar />
-      <PollingProvider>
-        <div className="flex flex-col flex-1">
-          <Topbar />
-          <div className="">
-            <main className="">
-              {children}
-            </main>
+      <OnlineStoreHeader/>
+      <div className=" flex ">
+
+        <OnlineStoreSidebar />
+        <PollingProvider>
+          <div className="flex flex-col flex-1">
+            <Topbar />
+            <div className="">
+              <main className="">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
-      </PollingProvider>
+        </PollingProvider>
+      </div>
     </div>
   )
 }

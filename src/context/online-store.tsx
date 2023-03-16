@@ -2,6 +2,8 @@ import axios from "axios"
 import React, { createContext, ReactNode, useEffect, useState } from "react"
 
 type OnlineStoreContextType = {
+  typeView: string
+  setTypeView: (value:string) => void
   isLoading: boolean
   setLoading: (status: boolean) => void
   inputValue: string
@@ -22,6 +24,8 @@ type OnlineStoreContextType = {
 }
 
 const OnlineStoreContext = createContext<OnlineStoreContextType>({
+  typeView:"desktop",
+  setTypeView: ()=>{},
   isLoading: true,
   setLoading: () => {},
   inputValue: "",
@@ -84,6 +88,7 @@ const updateSection = (sectionId: string, inputValue: string, iframeDocument: HT
 };
 
 const OnlineStoreProvider = ({ children }: Props) => {
+  const [typeView, setTypeView] = useState<string>('desktop');
   const [isLoading, setIsLoading] = useState(true)
   const [inputValue, setInputValue] = useState("")
   const [iframeDocument, setIframeDocument] = useState<HTMLElement | null>(null)
@@ -120,6 +125,8 @@ const OnlineStoreProvider = ({ children }: Props) => {
   return (
     <OnlineStoreContext.Provider
       value={{
+        typeView: typeView,
+        setTypeView: setTypeView,
         isLoading: isLoading,
         setLoading: setIsLoading,
         inputValue: inputValue,
@@ -142,6 +149,8 @@ export default OnlineStoreProvider
 
 export const useOnlineStore = () => {
   const {
+    typeView,
+    setTypeView,
     isLoading,
     setLoading,
     inputValue,
@@ -156,6 +165,8 @@ export const useOnlineStore = () => {
   } = React.useContext(OnlineStoreContext)
 
   return {
+    typeView,
+    setTypeView,
     isLoading,
     setLoading,
     inputValue,

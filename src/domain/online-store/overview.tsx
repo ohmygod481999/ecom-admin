@@ -8,7 +8,7 @@ const Overview = () => {
 
   return (
     <>
-      <div className="flex h-full grow flex-col pb-xlarge">
+      <div className="flex h-full grow flex-col pb-xlarge items-center">
         <OnlineStoreIframe />
       </div>
     </>

@@ -3,7 +3,7 @@ import { useOnlineStore } from "../../../context/online-store"
 
 const OnlineStoreIframe = () => {
   const ref = useRef<HTMLIFrameElement>(null)
-  const { setIframeDocument, setIframe } = useOnlineStore()
+  const { setIframeDocument, setIframe, typeView } = useOnlineStore()
 
   const handleLoad = () => {
     const iframe = ref.current
@@ -30,13 +30,13 @@ const OnlineStoreIframe = () => {
     <div
       style={{
         height: "calc(100vh - 56px)",
+        width: `${typeView=="desktop"?'100%':'400px'}`,
       }}
     >
       <iframe
         ref={ref}
         style={{
           height: "100%",
-          width: "100%",
         }}
         src="http://longvb.net"
         title="YouTube video player"
