@@ -3,17 +3,19 @@ import React, { createContext, ReactNode, useEffect, useState } from "react"
 
 type OnlineStoreContextType = {
   currentSections: any[]
-  setCurrentSections: (value:any)=>void
+  setCurrentSections: (value: any) => void
   sectionId: string
-  setSectionId: (value:string) => void
+  setSectionId: (value: string) => void
   typeView: string
-  setTypeView: (value:string) => void 
+  setTypeView: (value: string) => void
   isLoading: boolean
   setLoading: (status: boolean) => void
   inputValue: {}
   setInputValue: (value: {}) => void
   iframeDocument: HTMLElement | null
   setIframeDocument: (value: HTMLElement | null) => void
+  iframeWindow: Window | null
+  setIframeWindow: (value: Window | null) => void
   iframe: HTMLIFrameElement | null
   setIframe: (value: HTMLIFrameElement | null) => void
   currentPage: {
@@ -21,33 +23,31 @@ type OnlineStoreContextType = {
     name: string
     id: string
   }
-  setCurrentPage: (value: {
-    path: string
-    name: string
-    id: string
-  }) => void
+  setCurrentPage: (value: { path: string; name: string; id: string }) => void
   pages: any[]
 }
 
 const OnlineStoreContext = createContext<OnlineStoreContextType>({
   currentSections: [],
   setCurrentSections: () => {},
-  sectionId: '',
-  setSectionId: ()=>{},
-  typeView:"desktop",
-  setTypeView: ()=>{},
+  sectionId: "",
+  setSectionId: () => {},
+  typeView: "desktop",
+  setTypeView: () => {},
   isLoading: true,
   setLoading: () => {},
   inputValue: {},
   setInputValue: () => {},
   iframeDocument: null,
   setIframeDocument: () => {},
+  iframeWindow: null,
+  setIframeWindow: () => {},
   iframe: null,
   setIframe: () => {},
   currentPage: {
     path: "/",
     name: "Home",
-    id: 'index'
+    id: "index",
   },
   setCurrentPage: () => {},
   pages: [],
@@ -58,21 +58,26 @@ type Props = {
 }
 
 function htmlToElement(html: string) {
-  var template = document.createElement('template');
-  html = html.trim(); // Never return a text node of whitespace as the result
-  template.innerHTML = html;
-  return template.content.firstChild;
+  var template = document.createElement("template")
+  html = html.trim() // Never return a text node of whitespace as the result
+  template.innerHTML = html
+  return template.content.firstChild
 }
 
 function getElementByEcomId(iframeDoc: HTMLElement, ecomid: string) {
-  return iframeDoc.querySelector(`[ecom-id="${ecomid}"]`);
+  return iframeDoc.querySelector(`[ecom-id="${ecomid}"]`)
 }
 
-const updateSection = (sectionId: string, inputValue:any, iframeDocument: HTMLElement | null) => {
+const updateSection = (
+  sectionId: string,
+  inputValue: any,
+  iframeDocument: HTMLElement | null,
+  iframeWindow: Window | null
+) => {
   console.log(inputValue)
   if (iframeDocument && sectionId) {
     // get element which has attribute ecom-id=sectionId
-    const element = iframeDocument.querySelector(`[ecom-id=${sectionId}]`);
+    const element = iframeDocument.querySelector(`[ecom-id=${sectionId}]`)
     if (element && inputValue) {
       console.log(inputValue)
       axios
@@ -81,45 +86,50 @@ const updateSection = (sectionId: string, inputValue:any, iframeDocument: HTMLEl
             ...inputValue,
           },
         })
-        .then(({data}) => {
-          const {sections} = data;
-          Object.keys(sections).forEach(_sectionId => {
-            const section = getElementByEcomId(iframeDocument, _sectionId);
-            const replacedElement = htmlToElement(sections[sectionId]);
+        .then(({ data }) => {
+          const { sections } = data
+          const { html, script } = sections[sectionId]
+          Object.keys(sections).forEach((_sectionId) => {
+            const section = getElementByEcomId(iframeDocument, _sectionId)
+            const replacedElement = htmlToElement(html)
             if (section && replacedElement) {
-              section.parentNode?.replaceChild(replacedElement, section);
+              section.parentNode?.replaceChild(replacedElement, section)
             }
-          });
-        });
+          })
+          if (script) {
+            ;(iframeWindow as any).eval(script)
+          }
+        })
     }
   }
-};
+}
 
 const OnlineStoreProvider = ({ children }: Props) => {
   const [currentSections, setCurrentSections] = useState<any>([])
-  const [sectionId, setSectionId] = useState<string>('')
-  const [typeView, setTypeView] = useState<string>('desktop');
+  const [sectionId, setSectionId] = useState<string>("")
+  const [typeView, setTypeView] = useState<string>("desktop")
   const [isLoading, setIsLoading] = useState(true)
   const [inputValue, setInputValue] = useState<any>({})
   const [iframeDocument, setIframeDocument] = useState<HTMLElement | null>(null)
+  const [iframeWindow, setIframeWindow] = useState<Window | null>(null)
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null)
   const [pages, setPages] = useState([])
   const [currentPage, setCurrentPage] = useState({
     path: "/",
     name: "Home",
-    id: 'index'
+    id: "index",
   })
-  useEffect(()=>{
-    axios.get('http://longvb.net/api-admin/pages').then(({data})=>{
+  useEffect(() => {
+    axios.get("http://longvb.net/api-admin/pages").then(({ data }) => {
       setPages(data.pages)
       setIsLoading(false)
     })
-  },[])
+  }, [])
   useEffect(() => {
-    if (iframeDocument) {
-      updateSection(sectionId, inputValue, iframeDocument);
+    if (iframeDocument && iframeWindow) {
+      updateSection(sectionId, inputValue, iframeDocument, iframeWindow)
     }
-  }, [inputValue, iframeDocument])
+  }, [inputValue, iframeDocument, iframeWindow])
 
   useEffect(() => {
     if (iframe) {
@@ -141,6 +151,8 @@ const OnlineStoreProvider = ({ children }: Props) => {
         setInputValue: setInputValue,
         iframeDocument: iframeDocument,
         setIframeDocument: setIframeDocument,
+        iframeWindow: iframeWindow,
+        setIframeWindow: setIframeWindow,
         iframe: iframe,
         setIframe: setIframe,
         currentPage: currentPage,
@@ -169,6 +181,8 @@ export const useOnlineStore = () => {
     setInputValue,
     iframeDocument,
     setIframeDocument,
+    iframeWindow,
+    setIframeWindow,
     iframe,
     setIframe,
     currentPage,
@@ -189,6 +203,8 @@ export const useOnlineStore = () => {
     setInputValue,
     iframeDocument,
     setIframeDocument,
+    iframeWindow,
+    setIframeWindow,
     iframe,
     setIframe,
     currentPage,

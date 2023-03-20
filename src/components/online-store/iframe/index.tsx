@@ -3,7 +3,7 @@ import { useOnlineStore } from "../../../context/online-store"
 
 const OnlineStoreIframe = () => {
   const ref = useRef<HTMLIFrameElement>(null)
-  const { setIframeDocument, setIframe, typeView } = useOnlineStore()
+  const { setIframeDocument, setIframeWindow, setIframe, typeView } = useOnlineStore()
 
   const handleLoad = () => {
     const iframe = ref.current
@@ -17,6 +17,7 @@ const OnlineStoreIframe = () => {
         const iframeWindow = iframe?.contentWindow
         console.log(iframeWindow?.location.pathname)
         setIframeDocument(doc || null)
+        setIframeWindow(iframeWindow || null)
         setIframe(iframe || null)
       }
     }
