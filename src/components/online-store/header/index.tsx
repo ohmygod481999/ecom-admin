@@ -3,6 +3,8 @@ import { useOnlineStore } from "../../../context/online-store"
 import { NextSelect } from "../../molecules/select/next-select"
 import { ComputerMonitorIcon } from "../online-store-icon"
 import axios from "axios"
+import { NavLink } from "react-router-dom"
+import useNotification from "../../../hooks/use-notification"
 
 export const OnlineStoreHeader = () => {
   const { typeView, setTypeView, pages, currentPage, setCurrentPage, currentSections } =
@@ -20,25 +22,23 @@ export const OnlineStoreHeader = () => {
     value: currentPage.path,
     id: currentPage.id,
   }
+  const notification = useNotification()
   const save =()=>{
     axios.put(`http://longvb.net/api-admin/pages/${currentPage.id}`,{
       "page_settings": {
         "sections": [...currentSections]
       }
     }).then(()=>{
-      console.log({
-        "page_settings":
-        {
-          "sections": [...currentSections]
-        }
-      }
-      )
+      notification("Success", "save successful", "success")
     })
   }
 
   return (
     <div className="flex w-full items-center justify-between border p-2">
-      <div>
+      <div className="flex items-center gap-4">
+        <NavLink to={'/'}>
+          Back
+        </NavLink>
         <p>Dawn</p>
       </div>
       <div className=" w-4/12 ">
