@@ -2,12 +2,16 @@ import axios from "axios"
 import React, { createContext, ReactNode, useEffect, useState } from "react"
 
 type OnlineStoreContextType = {
+  currentSections: any[]
+  setCurrentSections: (value:any)=>void
+  sectionId: string
+  setSectionId: (value:string) => void
   typeView: string
-  setTypeView: (value:string) => void
+  setTypeView: (value:string) => void 
   isLoading: boolean
   setLoading: (status: boolean) => void
-  inputValue: string
-  setInputValue: (value: string) => void
+  inputValue: {}
+  setInputValue: (value: {}) => void
   iframeDocument: HTMLElement | null
   setIframeDocument: (value: HTMLElement | null) => void
   iframe: HTMLIFrameElement | null
@@ -15,20 +19,26 @@ type OnlineStoreContextType = {
   currentPage: {
     path: string
     name: string
+    id: string
   }
   setCurrentPage: (value: {
     path: string
     name: string
+    id: string
   }) => void
   pages: any[]
 }
 
 const OnlineStoreContext = createContext<OnlineStoreContextType>({
+  currentSections: [],
+  setCurrentSections: () => {},
+  sectionId: '',
+  setSectionId: ()=>{},
   typeView:"desktop",
   setTypeView: ()=>{},
   isLoading: true,
   setLoading: () => {},
-  inputValue: "",
+  inputValue: {},
   setInputValue: () => {},
   iframeDocument: null,
   setIframeDocument: () => {},
@@ -37,6 +47,7 @@ const OnlineStoreContext = createContext<OnlineStoreContextType>({
   currentPage: {
     path: "/",
     name: "Home",
+    id: 'index'
   },
   setCurrentPage: () => {},
   pages: [],
@@ -57,20 +68,17 @@ function getElementByEcomId(iframeDoc: HTMLElement, ecomid: string) {
   return iframeDoc.querySelector(`[ecom-id="${ecomid}"]`);
 }
 
-const updateSection = (sectionId: string, inputValue: string, iframeDocument: HTMLElement | null) => {
-  if (iframeDocument) {
+const updateSection = (sectionId: string, inputValue:any, iframeDocument: HTMLElement | null) => {
+  console.log(inputValue)
+  if (iframeDocument && sectionId) {
     // get element which has attribute ecom-id=sectionId
     const element = iframeDocument.querySelector(`[ecom-id=${sectionId}]`);
-    if (element) {
+    if (element && inputValue) {
+      console.log(inputValue)
       axios
         .post(`http://longvb.net/api-admin/sections/${sectionId}/preview`, {
           section_settings: {
-            variables: {
-              text2: {
-                type: 'text',
-                text: inputValue,
-              },
-            },
+            ...inputValue,
           },
         })
         .then(({data}) => {
@@ -88,31 +96,28 @@ const updateSection = (sectionId: string, inputValue: string, iframeDocument: HT
 };
 
 const OnlineStoreProvider = ({ children }: Props) => {
+  const [currentSections, setCurrentSections] = useState<any>([])
+  const [sectionId, setSectionId] = useState<string>('')
   const [typeView, setTypeView] = useState<string>('desktop');
   const [isLoading, setIsLoading] = useState(true)
-  const [inputValue, setInputValue] = useState("")
+  const [inputValue, setInputValue] = useState<any>({})
   const [iframeDocument, setIframeDocument] = useState<HTMLElement | null>(null)
   const [iframe, setIframe] = useState<HTMLIFrameElement | null>(null)
+  const [pages, setPages] = useState([])
   const [currentPage, setCurrentPage] = useState({
     path: "/",
     name: "Home",
+    id: 'index'
   })
-
-  const pages = [
-    {
-      name: "Home",
-      path: "/",
-    },
-    {
-      name: "About",
-      path: "/about",
-    },
-  ]
-  
-
+  useEffect(()=>{
+    axios.get('http://longvb.net/api-admin/pages').then(({data})=>{
+      setPages(data.pages)
+      setIsLoading(false)
+    })
+  },[])
   useEffect(() => {
     if (iframeDocument) {
-      updateSection("free-offer", inputValue, iframeDocument);
+      updateSection(sectionId, inputValue, iframeDocument);
     }
   }, [inputValue, iframeDocument])
 
@@ -121,10 +126,13 @@ const OnlineStoreProvider = ({ children }: Props) => {
       iframe.src = `http://longvb.net${currentPage.path}`
     }
   }, [currentPage, iframe])
-
   return (
     <OnlineStoreContext.Provider
       value={{
+        currentSections: currentSections,
+        setCurrentSections: setCurrentSections,
+        sectionId: sectionId,
+        setSectionId: setSectionId,
         typeView: typeView,
         setTypeView: setTypeView,
         isLoading: isLoading,
@@ -149,6 +157,10 @@ export default OnlineStoreProvider
 
 export const useOnlineStore = () => {
   const {
+    currentSections,
+    setCurrentSections,
+    sectionId,
+    setSectionId,
     typeView,
     setTypeView,
     isLoading,
@@ -165,6 +177,10 @@ export const useOnlineStore = () => {
   } = React.useContext(OnlineStoreContext)
 
   return {
+    currentSections,
+    setCurrentSections,
+    sectionId,
+    setSectionId,
     typeView,
     setTypeView,
     isLoading,

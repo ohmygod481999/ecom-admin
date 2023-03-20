@@ -34,6 +34,7 @@ const OnlineStoreIframe = () => {
       }}
     >
       <iframe
+        id="iframe"
         ref={ref}
         style={{
           height: "100%",

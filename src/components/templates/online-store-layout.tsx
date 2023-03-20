@@ -3,7 +3,7 @@ import { Toaster } from "react-hot-toast"
 import Sidebar from "../organisms/sidebar"
 import Topbar from "../organisms/topbar"
 import { PollingProvider } from "../../context/polling"
-import { OnlineStoreSidebar } from "../online-store/sidebar"
+import { OnlineStoreSidebarLeft, OnlineStoreSidebarRight } from "../online-store/sidebar"
 import { OnlineStoreHeader } from "../online-store/header"
 
 const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -20,7 +20,7 @@ const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
       <OnlineStoreHeader/>
       <div className=" flex ">
 
-        <OnlineStoreSidebar />
+        <OnlineStoreSidebarLeft />
         <PollingProvider>
           <div className="flex flex-col flex-1">
             <Topbar />
@@ -31,6 +31,7 @@ const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
             </div>
           </div>
         </PollingProvider>
+        <OnlineStoreSidebarRight/>
       </div>
     </div>
   )
