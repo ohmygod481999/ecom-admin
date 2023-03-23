@@ -40,6 +40,23 @@ export const OnlineStoreHeader = () => {
           Back
         </NavLink>
         <p>Dawn</p>
+        <div className="dropdown group relative mx-4 inline-block">
+          <button className="inline-flex h-5 w-5 items-center">
+            ...
+          </button>
+          <div className="absolute z-50 hidden group-hover:block ">
+            <ul className="flex flex-col  overflow-hidden rounded pt-1 text-gray-700 ">
+              <li
+                className="cursor-pointer border bg-white px-4 py-2 hover:bg-grey-5 w-max"
+              >
+                <NavLink to={'/online-store/edit-code'}>
+                  Edit code
+                </NavLink>
+              </li>
+              
+            </ul>
+          </div>
+        </div>
       </div>
       <div className=" w-4/12 ">
         <NextSelect

@@ -1,9 +1,11 @@
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { Route, Routes } from "react-router-dom"
+import { EditCodeHeader } from "../components/online-store/edit-code/header"
+import { EditCodeSidebarLeft } from "../components/online-store/edit-code/sidebar"
 import PrivateRoute from "../components/private-route"
 import SEO from "../components/seo"
-import OnlineStoreLayout from "../components/templates/online-store-layout"
+import OnlineStoreLayout, { OnlineStoreEditCodeLayout } from "../components/templates/online-store-layout"
 import OnlineStoreProvider from "../context/online-store"
 import OnlineStore from "../domain/online-store"
 
@@ -19,14 +21,34 @@ const OnlineStoreRoutes = () => {
   return (
     <OnlineStoreProvider>
       <DndProvider backend={HTML5Backend}>
-        <OnlineStoreLayout>
+        {/* <OnlineStoreLayout>
           <SEO title="Medusa" />
-          <Routes className="h-full">
-
-            {/* my custom routes */}
-            <Route path="/" element={<OnlineStore />} />
+          <Routes className="h-full"> */}
+        {/* my custom routes */}
+        {/* <Route path="/" element={<OnlineStore />} />
+            <Route path="/edit-code" element={<OnlineStore/>} />
           </Routes>
-        </OnlineStoreLayout>
+        </OnlineStoreLayout> */}
+        <Routes className="h-full">
+          <Route
+            path="/"
+            element={
+              <OnlineStoreLayout>
+                <SEO title="Medusa" />
+                <OnlineStore />
+              </OnlineStoreLayout>
+            }
+          />
+          <Route 
+            path="/edit-code"
+            element = {
+              <OnlineStoreEditCodeLayout>
+                <SEO title="Edit code" />
+                <EditCodeSidebarLeft/>
+              </OnlineStoreEditCodeLayout>
+            }
+          />
+        </Routes>
       </DndProvider>
     </OnlineStoreProvider>
   )
