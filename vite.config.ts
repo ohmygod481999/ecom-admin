@@ -40,6 +40,7 @@ export default defineConfig({
         env.GATSBY_STORE_URL ||
         ""
     ),
+    'global': 'window'
   },
   optimizeDeps: {
     exclude: ["typeorm", "medusa-interfaces"],

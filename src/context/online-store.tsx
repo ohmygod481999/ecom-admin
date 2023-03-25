@@ -2,6 +2,12 @@ import axios from "axios"
 import React, { createContext, ReactNode, useEffect, useState } from "react"
 
 type OnlineStoreContextType = {
+  fileValue: string 
+  setFileValue: (value:any)=>void
+  selectedFile: {}
+  setSelectedFile: (value:any)=> void
+  selectedFiles: any[]
+  setSelectedFiles: (value:any)=> void
   currentSections: any[]
   setCurrentSections: (value: any) => void
   sectionId: string
@@ -28,6 +34,12 @@ type OnlineStoreContextType = {
 }
 
 const OnlineStoreContext = createContext<OnlineStoreContextType>({
+  setFileValue : ()=>{},
+  fileValue: '',
+  selectedFile: {},
+  setSelectedFile: ()=>{},
+  selectedFiles: [],
+  setSelectedFiles: ()=>{},
   currentSections: [],
   setCurrentSections: () => {},
   sectionId: "",
@@ -105,6 +117,9 @@ const updateSection = (
 }
 
 const OnlineStoreProvider = ({ children }: Props) => {
+  const [fileValue, setFileValue] = useState<string>('')
+  const [selectedFile, setSelectedFile] = useState<any>({})
+  const [selectedFiles, setSelectedFiles] = useState<any[]>([])
   const [currentSections, setCurrentSections] = useState<any>([])
   const [sectionId, setSectionId] = useState<string>("")
   const [typeView, setTypeView] = useState<string>("desktop")
@@ -139,6 +154,12 @@ const OnlineStoreProvider = ({ children }: Props) => {
   return (
     <OnlineStoreContext.Provider
       value={{
+        fileValue,
+        setFileValue,
+        selectedFile,
+        setSelectedFile,
+        selectedFiles: selectedFiles,
+        setSelectedFiles: setSelectedFiles,
         currentSections: currentSections,
         setCurrentSections: setCurrentSections,
         sectionId: sectionId,
@@ -169,6 +190,12 @@ export default OnlineStoreProvider
 
 export const useOnlineStore = () => {
   const {
+    fileValue,
+    setFileValue,
+    selectedFile,
+    setSelectedFile,
+    selectedFiles,
+    setSelectedFiles,
     currentSections,
     setCurrentSections,
     sectionId,
@@ -191,6 +218,12 @@ export const useOnlineStore = () => {
   } = React.useContext(OnlineStoreContext)
 
   return {
+    fileValue,
+    setFileValue,
+    selectedFile,
+    setSelectedFile,
+    selectedFiles,
+    setSelectedFiles,
     currentSections,
     setCurrentSections,
     sectionId,

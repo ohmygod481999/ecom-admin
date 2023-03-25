@@ -43,6 +43,14 @@ const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
 export const OnlineStoreEditCodeLayout: React.FC<React.PropsWithChildren> = ({ children }) =>{
   return (
     <div className="flex flex-col w-full h-screen">
+      <Toaster
+        containerStyle={{
+          top: 74,
+          left: 24,
+          bottom: 24,
+          right: 24,
+        }}
+      />
       <EditCodeHeader/>
       <div className="flex h-full">
         {children}

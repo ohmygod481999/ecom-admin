@@ -1,6 +1,7 @@
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { Route, Routes } from "react-router-dom"
+import { CodeEditor } from "../components/online-store/edit-code/code-editor"
 import { EditCodeHeader } from "../components/online-store/edit-code/header"
 import { EditCodeSidebarLeft } from "../components/online-store/edit-code/sidebar"
 import PrivateRoute from "../components/private-route"
@@ -45,6 +46,7 @@ const OnlineStoreRoutes = () => {
               <OnlineStoreEditCodeLayout>
                 <SEO title="Edit code" />
                 <EditCodeSidebarLeft/>
+                <CodeEditor/>
               </OnlineStoreEditCodeLayout>
             }
           />
