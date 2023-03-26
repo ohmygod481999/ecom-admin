@@ -2,6 +2,8 @@ import axios from "axios"
 import React, { createContext, ReactNode, useEffect, useState } from "react"
 
 type OnlineStoreContextType = {
+  edited : boolean
+  setEdited: (value: any) =>void
   fileValue: string 
   setFileValue: (value:any)=>void
   selectedFile: {}
@@ -34,6 +36,8 @@ type OnlineStoreContextType = {
 }
 
 const OnlineStoreContext = createContext<OnlineStoreContextType>({
+  edited: false,
+  setEdited: ()=>{},
   setFileValue : ()=>{},
   fileValue: '',
   selectedFile: {},
@@ -117,6 +121,7 @@ const updateSection = (
 }
 
 const OnlineStoreProvider = ({ children }: Props) => {
+  const [edited, setEdited] = useState<boolean>(false)
   const [fileValue, setFileValue] = useState<string>('')
   const [selectedFile, setSelectedFile] = useState<any>({})
   const [selectedFiles, setSelectedFiles] = useState<any[]>([])
@@ -154,6 +159,8 @@ const OnlineStoreProvider = ({ children }: Props) => {
   return (
     <OnlineStoreContext.Provider
       value={{
+        edited,
+        setEdited,
         fileValue,
         setFileValue,
         selectedFile,
@@ -190,6 +197,8 @@ export default OnlineStoreProvider
 
 export const useOnlineStore = () => {
   const {
+    edited,
+    setEdited,
     fileValue,
     setFileValue,
     selectedFile,
@@ -218,6 +227,8 @@ export const useOnlineStore = () => {
   } = React.useContext(OnlineStoreContext)
 
   return {
+    edited,
+    setEdited,
     fileValue,
     setFileValue,
     selectedFile,

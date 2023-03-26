@@ -21,7 +21,7 @@ export const getFileType = (fileName: string) => {
   return fileName
 }
 export const CodeEditor = () => {
-  const { selectedFile, setFileValue } = useOnlineStore()
+  const { selectedFile, setFileValue, setEdited , edited } = useOnlineStore()
   const [codeValue, setCodeValue] = useState<string>("")
   const deboundSave = useDebounce(codeValue, 1000)
   const fileType = {
@@ -53,18 +53,26 @@ export const CodeEditor = () => {
   }, [deboundSave])
   return (
     <div className="h-full w-[calc(100%-20rem)] bg-slate-100 pt-2 pl-4 pr-2 pb-3">
-      <CodeEditorHeader />
-      <CodeMirror
-        height="100%"
-        width="100%"
-        maxWidth="100%"
-        theme={dracula}
-        value={codeValue}
-        extensions={fileType[getFileType(selectedFile["filePath"])]}
-        onChange={(value, viewUpdate) => {
-          setCodeValue(value)
-        }}
-      />
+      {
+        selectedFile['fileName']?<><CodeEditorHeader />
+        <CodeMirror
+          height="100%"
+          width="100%"
+          maxWidth="100%"
+          theme={dracula}
+          value={codeValue}
+          extensions={fileType[getFileType(selectedFile["filePath"])]}
+          onChange={(value, viewUpdate) => {
+            if(!edited){
+              setEdited(true)
+            }
+            setCodeValue(value)
+          }}
+        /></>:<div className="w-full h-full flex items-center justify-center">
+          <p>Choose a file to start editing</p>
+        </div>
+      }
+      
     </div>
   )
 }

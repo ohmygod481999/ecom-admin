@@ -31,11 +31,11 @@ export const CodeEditorHeader = () => {
     }
   }
   return (
-    <div className="flex min-h-[36px] w-full rounded border border-gray-200 bg-white">
+    <div className="flex min-h-[36px] w-full rounded border border-gray-200 bg-white overflow-x-scroll">
       {selectedFiles.map((file) => (
         <div
           key={file["fileName"]}
-          className={`flex cursor-pointer items-center justify-center gap-5 border-b-2 px-2 py-1 ${
+          className={`flex cursor-pointer items-center min-w-max justify-center gap-5 border-b-2 px-2 py-1 ${
             file["filePath"] == selectedFile["filePath"]
               ? "border-blue-80"
               : "border-transparent"

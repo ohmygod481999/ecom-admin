@@ -3,11 +3,16 @@ import { useEffect, useState } from "react"
 import { useOnlineStore } from "../../../../context/online-store"
 import { fileIcon } from "./icon"
 import { getFileType } from "../code-editor"
+import { useDebounce } from "../../../../hooks/use-debounce"
 
 export const EditCodeSidebarLeft = (props: {}) => {
   const { setSelectedFiles, setSelectedFile, selectedFile } = useOnlineStore()
   const [fileTree, setFileTree] = useState<any>({})
+  const [searchFile, setSearchFile] = useState<any>(null)
+  const [searchValue, setSearchValue] = useState<string>('')
   const [activeLists, setActiveList] = useState<any[]>([])
+
+  const deboundSearch = useDebounce(searchValue,1000)
   useEffect(() => {
     axios
       .get(`http://longvb.net/api-admin/code-editor/file-tree`)
@@ -15,7 +20,9 @@ export const EditCodeSidebarLeft = (props: {}) => {
         setFileTree(data.fileTree)
       })
   }, [])
-
+  useEffect(()=>{
+    setSearchFile(findKeyByPath(fileTree,deboundSearch))
+  },[deboundSearch])
   const renderObject = (obj) => {
     return Object.keys(obj).map((key) => {
       if (typeof obj[key] === "object") {
@@ -108,14 +115,39 @@ export const EditCodeSidebarLeft = (props: {}) => {
     })
   }
 
+  const findKeyByPath = (json, path) => {
+    if(path){
+
+      const pathArr = path.split('/');
+      let current = json;
+      for (let i = 1; i < pathArr.length; i++) {
+        const key = pathArr[i];
+        if (current.hasOwnProperty(key)) {
+          if(i == pathArr.length-1){
+            current = {
+              [key]: current[key]
+            }
+          }else{
+  
+            current = current[key];
+          }
+        } else {
+          return null;
+        }
+      }
+      return current;
+    }else{
+      return null
+    }
+  }
+
   return (
-    <div className="h-[calc(100%-136px)] w-80">
-      <div className="w-full border bg-white px-2 py-3 text-lg font-bold">
-        AA
-      </div>
+    <div className="h-[calc(100%-3.25rem)] w-80 py-3">
       <div className="h-full overflow-y-scroll">
-        <p className="px-4 py-4 text-sm uppercase">sections</p>
-        <div className=" h-full pl-1">{renderObject(fileTree)}</div>
+        <input className=" mx-2 px-2 py-2 text-sm outline-none border border-gray-200 w-[calc(100%-1rem)] rounded" onChange={(e)=>{
+          setSearchValue(e.target.value)
+        }} type={'text'} placeholder='Search file'/>
+        <div className=" h-full pl-1">{renderObject(searchFile?searchFile:fileTree)}</div>
       </div>
     </div>
   )

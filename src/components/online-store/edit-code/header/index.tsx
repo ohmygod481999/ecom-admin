@@ -5,7 +5,7 @@ import { useOnlineStore } from "../../../../context/online-store"
 import useNotification from "../../../../hooks/use-notification"
 
 export const EditCodeHeader = () => {
-  const { fileValue, selectedFile } = useOnlineStore()
+  const { fileValue, selectedFile , edited, setEdited} = useOnlineStore()
 
   const notification = useNotification()
   // const notification = useNotification()
@@ -21,6 +21,7 @@ export const EditCodeHeader = () => {
       )
       .then(() => {
         notification("Success", "Save successful", "success")
+        setEdited(false)
       })
       .catch(() => {
         notification("Failed", "Failed to save", "error")
@@ -28,7 +29,7 @@ export const EditCodeHeader = () => {
   }
 
   return (
-    <div className="flex w-full items-center justify-between border p-2">
+    <div className="flex w-full items-center justify-between border p-2 min-w-[3.25rem]">
       <div className="flex items-center gap-4">
         <NavLink to={"/online-store"}>Back</NavLink>
         <p>Dawn</p>
@@ -44,7 +45,7 @@ export const EditCodeHeader = () => {
         </div>
       </div>
       <div className="flex items-center">
-        <button className="btn btn-secondary btn-small" onClick={() => save()}>
+        <button className="btn btn-secondary btn-small" disabled={edited?false:true} onClick={() => save()}>
           <span className="mr-xsmall last:mr-0">SAVE</span>
         </button>
       </div>
