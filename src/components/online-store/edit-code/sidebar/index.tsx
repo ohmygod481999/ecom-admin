@@ -4,9 +4,10 @@ import { useOnlineStore } from "../../../../context/online-store"
 import { fileIcon } from "./icon"
 import { getFileType } from "../code-editor"
 import { useDebounce } from "../../../../hooks/use-debounce"
+import async from "react-select/dist/declarations/src/async/index"
 
 export const EditCodeSidebarLeft = (props: {}) => {
-  const { setSelectedFiles, setSelectedFile, selectedFile } = useOnlineStore()
+  const { setSelectedFiles, setSelectedFile, selectedFile, selectedFiles } = useOnlineStore()
   const [fileTree, setFileTree] = useState<any>({})
   const [searchFile, setSearchFile] = useState<any>(null)
   const [searchValue, setSearchValue] = useState<string>('')
@@ -23,6 +24,21 @@ export const EditCodeSidebarLeft = (props: {}) => {
   useEffect(()=>{
     setSearchFile(findKeyByPath(fileTree,deboundSearch))
   },[deboundSearch])
+  const getFileContent = (fileName:string, filePath: string)=>{
+    
+    axios
+        .get(
+          `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
+            filePath
+          )}`
+        ).then(({data})=>{
+          setSelectedFiles((prev)=>[...prev,{
+            filePath: filePath,
+            fileName: fileName,
+            fileContent: data.fileContent
+          }])
+        })
+  }
   const renderObject = (obj) => {
     return Object.keys(obj).map((key) => {
       if (typeof obj[key] === "object") {
@@ -76,29 +92,18 @@ export const EditCodeSidebarLeft = (props: {}) => {
             selectedFile["filePath"] == obj[key] ? "bg-slate-300" : ""
           }`}
           onClick={() => {
-            setSelectedFiles((prev) => {
-              let index = 0
-              if (prev.length > 0) {
-                for (let i = 0; i < prev.length; i++) {
-                  if (prev[i].filePath == obj[key]) {
-                    index = 1
-                    break
-                  }
+            let index = 0
+            if (selectedFiles.length > 0) {
+              for (let i = 0; i < selectedFiles.length; i++) {
+                if (selectedFiles[i].filePath == obj[key]) {
+                  index = 1
+                  break
                 }
               }
-              if (!index) {
-                return [
-                  ...prev,
-                  {
-                    filePath: obj[key],
-                    fileName: key,
-                  },
-                ]
-              } else {
-                return [...prev]
-              }
-            })
-
+            }
+            if (!index) {
+              getFileContent(key, obj[key])
+            }
             setSelectedFile({
               filePath: obj[key],
               fileName: key,

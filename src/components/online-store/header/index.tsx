@@ -36,7 +36,7 @@ export const OnlineStoreHeader = () => {
   return (
     <div className="flex w-full items-center justify-between border p-2">
       <div className="flex items-center gap-4">
-        <NavLink to={'/'}>
+        <NavLink to={'/online-store'}>
           Back
         </NavLink>
         <p>Dawn</p>

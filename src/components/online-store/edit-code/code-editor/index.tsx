@@ -6,7 +6,6 @@ import { StreamLanguage } from "@codemirror/language"
 import { useEffect, useState } from "react"
 import { CodeEditorHeader } from "./header"
 import { useOnlineStore } from "../../../../context/online-store"
-import axios from "axios"
 import { useDebounce } from "../../../../hooks/use-debounce"
 import { javascript } from "@codemirror/legacy-modes/mode/javascript"
 import { yaml } from "@codemirror/legacy-modes/mode/yaml"
@@ -21,7 +20,8 @@ export const getFileType = (fileName: string) => {
   return fileName
 }
 export const CodeEditor = () => {
-  const { selectedFile, setFileValue, setEdited , edited } = useOnlineStore()
+  const { selectedFile, setFileValue, selectedFiles,setSelectedFiles, setEdited, edited } =
+    useOnlineStore()
   const [codeValue, setCodeValue] = useState<string>("")
   const deboundSave = useDebounce(codeValue, 1000)
   const fileType = {
@@ -32,47 +32,58 @@ export const CodeEditor = () => {
     yaml: [StreamLanguage.define(yaml)],
   }
 
-  console.log(selectedFile)
   useEffect(() => {
     if (selectedFile["filePath"]) {
-      axios
-        .get(
-          `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
-            selectedFile["filePath"]
-          )}`
-        )
-        .then(({ data }) => {
-          setCodeValue(data.fileContent)
-        })
+      const codeValue = selectedFiles.filter(
+        (item) => item.filePath == selectedFile["filePath"]
+      )
+      if(codeValue.length>0){
+
+        setCodeValue(codeValue[0].fileContent)
+      }
     } else {
       setCodeValue("")
     }
-  }, [selectedFile])
+  }, [selectedFile,selectedFiles])
   useEffect(() => {
     setFileValue(deboundSave)
+    const newselectedFiles = selectedFiles.map((file) => {
+      if (file.filePath == selectedFile["filePath"]) {
+        return {
+          filePath: file.filePath,
+          fileName: file.fileName,
+          fileContent: deboundSave,
+        }
+      }
+      return file
+    })
+    setSelectedFiles([...newselectedFiles])
   }, [deboundSave])
   return (
     <div className="h-full w-[calc(100%-20rem)] bg-slate-100 pt-2 pl-4 pr-2 pb-3">
-      {
-        selectedFile['fileName']?<><CodeEditorHeader />
-        <CodeMirror
-          height="100%"
-          width="100%"
-          maxWidth="100%"
-          theme={dracula}
-          value={codeValue}
-          extensions={fileType[getFileType(selectedFile["filePath"])]}
-          onChange={(value, viewUpdate) => {
-            if(!edited){
-              setEdited(true)
-            }
-            setCodeValue(value)
-          }}
-        /></>:<div className="w-full h-full flex items-center justify-center">
+      {selectedFile["fileName"] ? (
+        <>
+          <CodeEditorHeader />
+          <CodeMirror
+            height="100%"
+            width="100%"
+            maxWidth="100%"
+            theme={dracula}
+            value={codeValue}
+            extensions={fileType[getFileType(selectedFile["filePath"])]}
+            onChange={(value, viewUpdate) => {
+              if (!edited) {
+                setEdited(true)
+              }
+              setCodeValue(value)
+            }}
+          />
+        </>
+      ) : (
+        <div className="flex h-full w-full items-center justify-center">
           <p>Choose a file to start editing</p>
         </div>
-      }
-      
+      )}
     </div>
   )
 }

@@ -5,27 +5,28 @@ import { useOnlineStore } from "../../../../context/online-store"
 import useNotification from "../../../../hooks/use-notification"
 
 export const EditCodeHeader = () => {
-  const { fileValue, selectedFile , edited, setEdited} = useOnlineStore()
+  const { fileValue, selectedFile, selectedFiles , edited, setEdited} = useOnlineStore()
 
   const notification = useNotification()
   // const notification = useNotification()
   const save = () => {
-    axios
-      .put(
-        `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
-          selectedFile["filePath"]
-        )}`,
-        {
-          fileContent: fileValue,
-        }
-      )
-      .then(() => {
-        notification("Success", "Save successful", "success")
-        setEdited(false)
-      })
-      .catch(() => {
-        notification("Failed", "Failed to save", "error")
-      })
+    try {
+      for(let i = 0; i< selectedFiles.length;i++){
+        axios
+        .put(
+          `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
+            selectedFiles[i].filePath
+          )}`,
+          {
+            fileContent: selectedFiles[i].fileContent,
+          }
+        )
+      }
+      notification("Success", "Save successful", "success")
+      setEdited(false)
+    } catch (error) {
+      notification("Failed", "Failed to save", "error")
+    }
   }
 
   return (
