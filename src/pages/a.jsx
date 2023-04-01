@@ -10,6 +10,7 @@ import AnalyticsProvider from "../context/analytics"
 import Collections from "../domain/collections"
 import Customers from "../domain/customers"
 import Discounts from "../domain/discounts"
+import Gallery from "../domain/gallery"
 import GiftCards from "../domain/gift-cards"
 import Oauth from "../domain/oauth"
 import OnlineStore from "../domain/online-store"
@@ -49,6 +50,7 @@ const DashboardRoutes = () => {
             <Route path="discounts/*" element={<Discounts />} />
             <Route path="customers/*" element={<Customers />} />
             <Route path="pricing/*" element={<Pricing />} />
+            <Route path="gallery/*" element={<Gallery/>} />
             <Route path="settings/*" element={<Settings />} />
             <Route path="sales-channels/*" element={<SalesChannels />} />
             <Route
