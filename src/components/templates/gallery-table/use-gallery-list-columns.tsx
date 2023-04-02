@@ -13,7 +13,9 @@ export const useGalleryListTableColumns = () => {
         accessor: "url",
         Cell: ({ cell: { value } }) => (
           <Table.Cell>
-            <img src={value} className="h-full rounded-soft object-cover py-2 px-1" />
+            <div className="w-40 h-28">
+              <img src={value} className="h-full rounded-soft object-cover py-2 px-1 w-full" />
+            </div>
           </Table.Cell>
         ),
       },
