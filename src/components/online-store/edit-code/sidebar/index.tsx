@@ -7,13 +7,14 @@ import { useDebounce } from "../../../../hooks/use-debounce"
 import async from "react-select/dist/declarations/src/async/index"
 
 export const EditCodeSidebarLeft = (props: {}) => {
-  const { setSelectedFiles, setSelectedFile, selectedFile, selectedFiles } = useOnlineStore()
+  const { setSelectedFiles, setSelectedFile, selectedFile, selectedFiles } =
+    useOnlineStore()
   const [fileTree, setFileTree] = useState<any>({})
   const [searchFile, setSearchFile] = useState<any>(null)
-  const [searchValue, setSearchValue] = useState<string>('')
+  const [searchValue, setSearchValue] = useState<string>("")
   const [activeLists, setActiveList] = useState<any[]>([])
 
-  const deboundSearch = useDebounce(searchValue,1000)
+  const deboundSearch = useDebounce(searchValue, 1000)
   useEffect(() => {
     axios
       .get(`http://longvb.net/api-admin/code-editor/file-tree`)
@@ -21,30 +22,32 @@ export const EditCodeSidebarLeft = (props: {}) => {
         setFileTree(data.fileTree)
       })
   }, [])
-  useEffect(()=>{
-    setSearchFile(findKeyByPath(fileTree,deboundSearch))
-  },[deboundSearch])
-  const getFileContent = (fileName:string, filePath: string)=>{
-    
+  useEffect(() => {
+    setSearchFile(findKeyByPath(fileTree, deboundSearch))
+  }, [deboundSearch])
+  const getFileContent = (fileName: string, filePath: string) => {
     axios
-        .get(
-          `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
-            filePath
-          )}`
-        ).then(({data})=>{
-          setSelectedFiles((prev)=>[...prev,{
+      .get(
+        `http://longvb.net/api-admin/code-editor/file/${encodeURIComponent(
+          filePath
+        )}`
+      )
+      .then(({ data }) => {
+        setSelectedFiles((prev) => [
+          ...prev,
+          {
             filePath: filePath,
             fileName: fileName,
-            fileContent: data.fileContent
-          }])
-        })
+            fileContent: data.fileContent,
+          },
+        ])
+      })
   }
   const renderObject = (obj) => {
     return Object.keys(obj).map((key) => {
       if (typeof obj[key] === "object") {
         return (
           <li key={key} className=" list-item list-none">
-            {/* icon và tên */}
             <span
               className="flex cursor-pointer select-none items-center"
               onClick={() => {
@@ -121,27 +124,25 @@ export const EditCodeSidebarLeft = (props: {}) => {
   }
 
   const findKeyByPath = (json, path) => {
-    if(path){
-
-      const pathArr = path.split('/');
-      let current = json;
+    if (path) {
+      const pathArr = path.split("/")
+      let current = json
       for (let i = 1; i < pathArr.length; i++) {
-        const key = pathArr[i];
+        const key = pathArr[i]
         if (current.hasOwnProperty(key)) {
-          if(i == pathArr.length-1){
+          if (i == pathArr.length - 1) {
             current = {
-              [key]: current[key]
+              [key]: current[key],
             }
-          }else{
-  
-            current = current[key];
+          } else {
+            current = current[key]
           }
         } else {
-          return null;
+          return null
         }
       }
-      return current;
-    }else{
+      return current
+    } else {
       return null
     }
   }
@@ -149,10 +150,17 @@ export const EditCodeSidebarLeft = (props: {}) => {
   return (
     <div className="h-[calc(100%-3.25rem)] w-80 py-3">
       <div className="h-full overflow-y-scroll">
-        <input className=" mx-2 px-2 py-2 text-sm outline-none border border-gray-200 w-[calc(100%-1rem)] rounded" onChange={(e)=>{
-          setSearchValue(e.target.value)
-        }} type={'text'} placeholder='Search file'/>
-        <div className=" h-full pl-1">{renderObject(searchFile?searchFile:fileTree)}</div>
+        <input
+          className=" mx-2 w-[calc(100%-1rem)] rounded border border-gray-200 px-2 py-2 text-sm outline-none"
+          onChange={(e) => {
+            setSearchValue(e.target.value)
+          }}
+          type={"text"}
+          placeholder="Search file"
+        />
+        <div className=" h-full pl-1">
+          {renderObject(searchFile ? searchFile : fileTree)}
+        </div>
       </div>
     </div>
   )

@@ -1,7 +1,9 @@
 import React, { IframeHTMLAttributes, useEffect, useState } from "react"
 import { useOnlineStore } from "../../../context/online-store"
 import { NextSelect } from "../../molecules/select/next-select"
+import { renderElement } from "./render-element"
 import axios from "axios"
+import { ClaimTag } from "@medusajs/medusa"
 
 export const OnlineStoreSidebarLeft = (props: {}) => {
   const { pages, currentPage, setSectionId } = useOnlineStore()
@@ -54,6 +56,7 @@ export const OnlineStoreSidebarLeft = (props: {}) => {
         <ul className="overflow-y-scroll pl-1">
           {sections.map((section) => (
             <li
+              key={section.id}
               className={`cursor-pointer px-4 py-1 capitalize ${
                 sectionActive == section.id
                   ? "rounded-sm border-l-4 border-l-blue-600 bg-green-50"
@@ -75,12 +78,12 @@ export const OnlineStoreSidebarLeft = (props: {}) => {
 
 export const OnlineStoreSidebarRight = (props: {}) => {
   const {
-    inputValue,
     setInputValue,
     currentPage,
     sectionId,
     setCurrentSections,
-    currentSections
+    inputValue,
+    currentSections,
   } = useOnlineStore()
 
   const [elements, setElements] = useState({})
@@ -91,7 +94,6 @@ export const OnlineStoreSidebarRight = (props: {}) => {
         .then(({ data }) => {
           const sectionsData: [] = data.page["settings"].sections
           setCurrentSections(sectionsData)
-          console.log(sectionsData)
           const section: any = sectionsData.filter(
             (section: any) => section.id == sectionId
           )[0]
@@ -99,23 +101,42 @@ export const OnlineStoreSidebarRight = (props: {}) => {
         })
     }
   }, [sectionId])
-  useEffect(()=>{
-    setInputValue({elements})
-    setCurrentSections((prev)=>{
-      if(prev && prev.length >= 1){
-        const index = prev.findIndex((section) => section.id === sectionId);
+  useEffect(() => {
+    setInputValue({ elements })
+    setCurrentSections((prev) => {
+      if (prev && prev.length >= 1) {
+        const index = prev.findIndex((section) => section.id === sectionId)
         if (index !== -1) {
           prev[index] = {
-            "id": sectionId,
-            "settings": {elements}
+            id: sectionId,
+            settings: { elements },
           }
         }
         return prev
       }
       return prev
     })
-
-  },[elements])
+  }, [elements])
+  console.log("debug", currentSections)
+  const handleElement = (e: any, key, keyValue, type) => {
+    if (type == "blocks") {
+      setElements((prev) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [keyValue]: [...e],
+        },
+      }))
+    } else {
+      setElements((prev) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [keyValue]: e.target.value,
+        },
+      }))
+    }
+  }
   return (
     <div className="w-80">
       <div className="w-full border bg-white px-2 py-3 text-lg font-bold">
@@ -124,55 +145,17 @@ export const OnlineStoreSidebarRight = (props: {}) => {
       <div>
         <p className="px-4 py-4 text-sm uppercase">Featured Collection</p>
         <ul className="overflow-y-scroll pl-1">
-          {
-            Object.keys(elements).map((key, index) => {
-              return (
-                <li key={key} className="flex flex-col px-4 py-1 capitalize">
-                  {key}
-                  {elements[key].type == "button" ? (
-                    <div >
-                      <input
-                        type="text"
-                        className="rounded-md border w-full p-2 bg-grey-5 border-grey-20 mb-1"
-                        value={elements[key].text}
-                        onChange={(e) => {
-                          setElements((prev)=>({...prev,[key]:{
-                            ...prev[key],
-                            text: e.target.value
-                          }}))
-                        }}
-                      />
-                      <input
-                        type="text"
-                        className="rounded-md border w-full p-2 bg-grey-5 border-grey-20"
-                        value={elements[key].url}
-                        onChange={(e) => {
-                          setElements((prev)=>({...prev,[key]:{
-                            ...prev[key],
-                            url: e.target.value
-                          }}))
-
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <input
-                      type="text"
-                      className="rounded-md border w-full p-2 bg-grey-5 border-grey-20"
-                      value={elements[key].text}
-                      onChange={(e) => {
-                        setElements((prev)=>({...prev,[key]:{
-                          ...prev[key],
-                          text: e.target.value
-                        }}))
-         
-                      }}
-                    />
-                  )}
-                </li>
-              )
-            })
-          }
+          {Object.keys(elements).map((key, index) => {
+            return (
+              <li key={key} className="flex flex-col px-4 py-1 capitalize">
+                {renderElement[elements[key].type]?.render(
+                  elements,
+                  key,
+                  handleElement
+                )}
+              </li>
+            )
+          })}
         </ul>
       </div>
     </div>
