@@ -98,15 +98,15 @@ type GalleryListTableProps = {
  * Root component of the Gallery lists table.
  */
 export function GalleryListTable(props: GalleryListTableProps) {
-  const [pageIndex, setPageIndex] = useState<number>(1)
-  let offset = (pageIndex - 1) * 5
-  const [galleryList, setGalleryList] = useState<GalleryList[]>([])
   const { GalleryLists, count, columns, options, isLoading } = props
+  const [pageIndex, setPageIndex] = useState<number>(1)
+  const limit = 5
+  const pageCount = count - (count % limit)
+  console.log("count", pageCount)
+  let offset = (pageIndex - 1) * limit
+  const [galleryList, setGalleryList] = useState<GalleryList[]>([])
   useEffect(() => {
-    const temp = GalleryLists.slice(
-      offset * (pageIndex - 1),
-      offset * (pageIndex - 1) + 5
-    )
+    const temp = GalleryLists.slice(offset, offset + limit)
     setGalleryList(temp)
   }, [pageIndex, GalleryLists])
   const tableConfig: TableOptions<GalleryList> = {
@@ -114,7 +114,7 @@ export function GalleryListTable(props: GalleryListTableProps) {
     data: galleryList || [],
     manualPagination: true,
     autoResetPage: false,
-    pageCount: 2,
+    pageCount: pageCount,
   }
 
   const table = useTable(tableConfig, useSortBy, usePagination, useRowSelect)
@@ -148,7 +148,7 @@ export function GalleryListTable(props: GalleryListTableProps) {
       pagingState={{
         count: count!,
         offset: offset,
-        pageSize: 5 * (pageIndex - 1) + 5,
+        pageSize: offset + limit > count ? count : offset + limit,
         title: "Gallery Lists",
         currentPage: table.state.pageIndex + 1,
         pageCount: table.pageCount,
