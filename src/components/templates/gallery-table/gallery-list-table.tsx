@@ -101,8 +101,8 @@ export function GalleryListTable(props: GalleryListTableProps) {
   const { GalleryLists, count, columns, options, isLoading } = props
   const [pageIndex, setPageIndex] = useState<number>(1)
   const limit = 5
-  const pageCount = count - (count % limit)
-  console.log("count", pageCount)
+  const pageCount = Math.ceil(count / limit)
+
   let offset = (pageIndex - 1) * limit
   const [galleryList, setGalleryList] = useState<GalleryList[]>([])
   useEffect(() => {
