@@ -115,10 +115,10 @@ export const SelectImageModal: React.FC<ImageModalProps> = ({
                 />
               </label>
             </div>
-            <div className="flex gap-2">
+            <div className="flex max-w-full flex-wrap gap-[1%] overflow-y-scroll">
               {listImage.map((image) => (
                 <div
-                  className="relative flex h-[70px] w-[70px] items-center rounded border"
+                  className="relative mb-3 flex aspect-square basis-[15.833333%] items-center rounded border"
                   onClick={() => {
                     setSelectedImage(image.url)
                   }}

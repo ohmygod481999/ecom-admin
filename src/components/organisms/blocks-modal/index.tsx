@@ -33,6 +33,16 @@ const EditBlockModal: React.FC<EditBlockModalProps> = ({
           },
         }
       })
+    } else if (type == "image") {
+      setElements((prev) => {
+        return {
+          ...prev,
+          [key]: {
+            ...prev[key],
+            [keyValue]: e,
+          },
+        }
+      })
     } else {
       setElements((prev) => {
         return {
