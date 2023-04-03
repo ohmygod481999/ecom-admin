@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react"
 import useNotification from "../../../hooks/use-notification"
 import { ReactSortable } from "react-sortablejs"
-import EditBlockModal from "../../organisms/edit-block-modal"
+import EditBlockModal, { AddBlockModal } from "../../organisms/blocks-modal"
+import { SelectImageModal } from "../../organisms/image-modal"
 
 export const RenderBlocks = (props) => {
   const { elements, keyValue, handleElement } = props
   const [active, setActive] = useState<boolean>(false)
   const [blocks, setBlocks] = useState<any>(elements[keyValue].blocks)
-  const [activeModal, setActiveModal] = useState<boolean>(false)
+  const [activeEditModal, setActiveEditModal] = useState<boolean>(false)
+  const [activeAddModal, setActiveAddModal] = useState<boolean>(false)
   const [indexBlock, setIndexBlock] = useState<number>(0)
   const notification = useNotification()
   console.log("block", elements)
@@ -49,12 +51,24 @@ export const RenderBlocks = (props) => {
           {blocks.map((block, index) => (
             <li
               key={index}
-              className={`group flex cursor-pointer items-center  py-1 `}
+              className={`group flex cursor-pointer items-center  gap-1 py-1`}
             >
+              <svg
+                width="18px"
+                height="18px"
+                viewBox="0 0 25 25"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6.5 8.5V7.9H5.9V8.5H6.5ZM18.5 8.5H19.1V7.9H18.5V8.5ZM6.5 16.5H5.9V17.1H6.5V16.5ZM18.5 16.5V17.1H19.1V16.5H18.5ZM6.5 9.1H18.5V7.9H6.5V9.1ZM7.1 16.5V8.5H5.9V16.5H7.1ZM18.5 15.9H6.5V17.1H18.5V15.9ZM17.9 8.5V16.5H19.1V8.5H17.9ZM5 20.1H20V18.9H5V20.1ZM5 6.1H20V4.9H5V6.1Z"
+                  fill="#121923"
+                />
+              </svg>
               <p
                 className="w-[-webkit-fill-available]"
                 onClick={() => {
-                  setActiveModal(!activeModal)
+                  setActiveEditModal(!activeEditModal)
                   setIndexBlock(index)
                 }}
               >
@@ -111,18 +125,57 @@ export const RenderBlocks = (props) => {
             </li>
           ))}
         </ReactSortable>
+        <li
+          className="flex cursor-pointer items-center gap-2 text-cyan-70"
+          onClick={() => setActiveAddModal(true)}
+        >
+          <svg
+            className="bg-orange-80"
+            width="16px"
+            height="16px"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <rect width="24" height="24" fill="white" />
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M13 9C13 8.44772 12.5523 8 12 8C11.4477 8 11 8.44772 11 9V11H9C8.44772 11 8 11.4477 8 12C8 12.5523 8.44772 13 9 13H11V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V13H15C15.5523 13 16 12.5523 16 12C16 11.4477 15.5523 11 15 11H13V9ZM2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12Z"
+              fill="#3276c3"
+            />
+          </svg>
+          Add Blocks
+        </li>
       </ul>
-      {activeModal ? (
+      {activeEditModal ? (
         <EditBlockModal
           indexValue={indexBlock}
           blocks={blocks}
           keyValue={keyValue}
           handleClose={() => {
-            setActiveModal(false)
+            setActiveEditModal(false)
           }}
           handleSave={(blocks) => {
             setBlocks([...blocks])
-            setActiveModal(false)
+            setActiveEditModal(false)
+          }}
+          handleElement={handleElement}
+        />
+      ) : (
+        ""
+      )}
+      {activeAddModal ? (
+        <AddBlockModal
+          indexValue={indexBlock}
+          blocks={blocks}
+          keyValue={keyValue}
+          handleClose={() => {
+            setActiveAddModal(false)
+          }}
+          handleSave={(blocks) => {
+            setBlocks([...blocks])
+            setActiveAddModal(false)
           }}
           handleElement={handleElement}
         />
@@ -132,7 +185,63 @@ export const RenderBlocks = (props) => {
     </li>
   )
 }
+export const RenderImage = (props) => {
+  const { elements, keyValue, handleElement } = props
 
+  const [openSelectImageModal, setOpenSelectImageModal] =
+    useState<boolean>(false)
+
+  return (
+    <>
+      <div className="flex justify-between">
+        {keyValue}
+        {elements[keyValue].url ? (
+          <p
+            onClick={() => {
+              setOpenSelectImageModal(true)
+            }}
+            className="cursor-pointer"
+          >
+            Change Image
+          </p>
+        ) : (
+          ""
+        )}
+      </div>
+      {elements[keyValue].url ? (
+        <>
+          <div className="flex w-full items-center justify-center rounded bg-gray-200 px-3 py-7">
+            <img src={elements[keyValue].url} alt={elements[keyValue].name} />
+          </div>
+        </>
+      ) : (
+        <div className="flex w-full items-center justify-center rounded bg-gray-200 px-3 py-7">
+          <button
+            onClick={() => {
+              setOpenSelectImageModal(true)
+            }}
+            className="rounded border border-gray-300 bg-white px-2 py-1 text-center"
+          >
+            Select image
+          </button>
+        </div>
+      )}
+      {openSelectImageModal ? (
+        <SelectImageModal
+          title="Select Image"
+          handleClose={() => {
+            setOpenSelectImageModal(false)
+          }}
+          handleElement={handleElement}
+          imageUrl={elements[keyValue].url}
+          keyValue={keyValue}
+        />
+      ) : (
+        ""
+      )}
+    </>
+  )
+}
 export const renderElement = {
   button: {
     render: (elements, key, handleElement) => (
@@ -160,14 +269,10 @@ export const renderElement = {
   image: {
     render: (elements, key, handleElement) => (
       <>
-        {key}
-        <input
-          type="text"
-          className="w-full rounded-md border border-grey-20 bg-grey-5 p-2"
-          value={elements[key].url}
-          onChange={(e) => {
-            handleElement(e, key, "url", "image")
-          }}
+        <RenderImage
+          elements={elements}
+          keyValue={key}
+          handleElement={handleElement}
         />
       </>
     ),

@@ -1,21 +1,24 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Button from "../../fundamentals/button"
 import Modal from "../../molecules/modal"
+import axios from "axios"
+import { GalleryList } from "../../templates/gallery-table/gallery-list-table"
+import useNotification from "../../../hooks/use-notification"
 
 type ImageModalProps = {
   handleClose: () => void
   onSubmit?: () => void
   loading?: boolean
   title: string
-  imageUrl: string
+  imageUrl?: string
+  handleElement?: (e: any, key, keyValue, type) => void
+  keyValue?: string
 }
 
 const ImageModal: React.FC<ImageModalProps> = ({
   handleClose,
   title,
-  loading,
-  onSubmit,
-  imageUrl
+  imageUrl,
 }) => {
   return (
     <Modal handleClose={handleClose}>
@@ -24,12 +27,12 @@ const ImageModal: React.FC<ImageModalProps> = ({
           <span className="inter-xlarge-semibold text-center">{title}</span>
         </Modal.Header>
         <Modal.Content>
-          <div className="flex mb-4 inter-small-regular text-grey-50 items-center justify-center">
+          <div className="inter-small-regular mb-4 flex items-center justify-center text-grey-50">
             <img src={imageUrl} alt="image name" className="object-cover" />
           </div>
         </Modal.Content>
         <Modal.Footer>
-          <div className="w-full flex justify-center items-center">
+          <div className="flex w-full items-center justify-center">
             <Button
               variant="ghost"
               size="small"
@@ -46,3 +49,119 @@ const ImageModal: React.FC<ImageModalProps> = ({
 }
 
 export default ImageModal
+
+export const SelectImageModal: React.FC<ImageModalProps> = ({
+  handleClose,
+  handleElement,
+  title,
+  imageUrl,
+  keyValue,
+}) => {
+  const [listImage, setListImage] = useState<GalleryList[]>([])
+  const [selectedImage, setSelectedImage] = useState<any>(imageUrl)
+  const [refresh, setRefresh] = useState<boolean>(false)
+  useEffect(() => {
+    axios.get("/api-admin/gallery").then(({ data }) => {
+      setListImage(data.gallery)
+    })
+  }, [imageUrl, refresh])
+  const notification = useNotification()
+  const handleUploadFIle = (file: File[]) => {
+    if (file.length > 0) {
+      const formData = new FormData()
+      formData.append("file", file[0])
+      axios
+        .post("/api-admin/gallery", formData)
+        .then(({ data }) => {
+          setRefresh(!refresh)
+          setSelectedImage(data.file.url)
+          notification("Success", "Upload successful", "success")
+        })
+        .catch(() => {
+          notification("Failed", "Failed to save", "error")
+        })
+    }
+  }
+  function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const files = event.target.files
+    if (files && files.length > 0) {
+      const images = Array.from(files).filter((file) =>
+        file.type.startsWith("image/")
+      )
+      if (images) {
+        handleUploadFIle(images)
+      }
+    }
+  }
+
+  return (
+    <Modal handleClose={handleClose}>
+      <Modal.Body>
+        <Modal.Header handleClose={handleClose}>
+          <span className="inter-xlarge-semibold text-center">{title}</span>
+        </Modal.Header>
+        <Modal.Content>
+          <div className="inter-small-regular mb-4 flex  flex-col items-center justify-center text-grey-50">
+            <div className="mb-5 flex h-40  w-full items-center justify-center rounded border-2 border-dashed">
+              <label>
+                <div className="cursor-pointer rounded bg-cyan-10 px-3 py-1 font-extrabold text-blue-70">
+                  Add image
+                </div>
+                <input
+                  type="file"
+                  className="block h-0 w-0 opacity-0"
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(e)}
+                />
+              </label>
+            </div>
+            <div className="flex gap-2">
+              {listImage.map((image) => (
+                <div
+                  className="relative flex h-[70px] w-[70px] items-center rounded border"
+                  onClick={() => {
+                    setSelectedImage(image.url)
+                  }}
+                >
+                  <img
+                    src={image.url}
+                    alt={image.name}
+                    className="object-fill"
+                  />
+                  <input
+                    type="checkbox"
+                    className="absolute top-3 left-3"
+                    checked={selectedImage == image.url ? true : false}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </Modal.Content>
+        <Modal.Footer>
+          <div className="flex w-full items-center justify-center">
+            <Button
+              variant="ghost"
+              size="small"
+              onClick={handleClose}
+              className="mr-2"
+            >
+              Close
+            </Button>
+            <Button
+              variant="ghost"
+              size="small"
+              onClick={() => {
+                handleElement!(selectedImage, keyValue, "url", "image")
+                handleClose()
+              }}
+              className="mr-2"
+            >
+              Save
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal.Body>
+    </Modal>
+  )
+}

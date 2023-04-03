@@ -127,6 +127,14 @@ export const OnlineStoreSidebarRight = (props: {}) => {
           [keyValue]: [...e],
         },
       }))
+    } else if (type == "image") {
+      setElements((prev) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [keyValue]: e,
+        },
+      }))
     } else {
       setElements((prev) => ({
         ...prev,
