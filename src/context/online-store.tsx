@@ -89,6 +89,7 @@ const updateSections = (
   iframeDocument: HTMLElement | null,
   iframeWindow: Window | null
 ) => {
+  console.log("--bug", inputValue)
   if (inputValue && iframeDocument) {
     axios
       .post(`http://longvb.net/api-admin/pages/${currentPage.id}/preview`, {
@@ -98,11 +99,13 @@ const updateSections = (
       })
       .then(({ data }) => {
         const { page } = data
+        console.log("bug", page, "--", currentPage.id)
         const { content_for_layout, script } = page
         const content_page = iframeDocument.querySelector("#content_for_layout")
         if (content_page) {
           content_page.innerHTML = content_for_layout
         }
+
         if (script) {
           ;(iframeWindow as any).eval(script)
         }
@@ -119,7 +122,6 @@ const updateSection = (
     // get element which has attribute ecom-id=sectionId
     const element = iframeDocument.querySelector(`[ecom-id=${sectionId}]`)
     if (element && inputValue) {
-      console.log(inputValue)
       axios
         .post(`http://longvb.net/api-admin/sections/${sectionId}/preview`, {
           section_settings: {
@@ -173,7 +175,7 @@ const OnlineStoreProvider = ({ children }: Props) => {
     if (iframeDocument && iframeWindow) {
       updateSection(sectionId, inputValue, iframeDocument, iframeWindow)
     }
-  }, [inputValue, iframeDocument, iframeWindow])
+  }, [inputValue])
   useEffect(() => {
     updateSections(currentSections, currentPage, iframeDocument, iframeWindow)
   }, [currentSections])

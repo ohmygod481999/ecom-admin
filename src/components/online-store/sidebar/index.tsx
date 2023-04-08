@@ -106,15 +106,18 @@ export const OnlineStoreSidebarRight = (props: {}) => {
     }
   }, [sectionId, currentSections])
   useEffect(() => {
+    console.log(1111, elements)
     setInputValue({ elements })
     setCurrentSections((prev) => {
       if (prev && prev.length >= 1) {
         const index = prev.findIndex((section) => section.id === sectionId)
         if (index !== -1) {
+          console.log("2222", prev[index])
           prev[index] = {
             id: sectionId,
-            settings: { elements },
+            settings: { ...prev[index].settings, elements: elements },
           }
+          console.log("33333", prev[index])
         }
         return prev
       }
