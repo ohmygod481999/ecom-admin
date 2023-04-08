@@ -12,6 +12,7 @@ import Customers from "../domain/customers"
 import Discounts from "../domain/discounts"
 import Gallery from "../domain/gallery"
 import GiftCards from "../domain/gift-cards"
+import Inventory from "../domain/inventory"
 import Oauth from "../domain/oauth"
 import OnlineStore from "../domain/online-store"
 import Orders from "../domain/orders"
@@ -57,6 +58,7 @@ const DashboardRoutes = () => {
               path="publishable-api-keys/*"
               element={<PublishableApiKeys />}
             />
+            <Route path="inventory/*" element={<Inventory />} />
           </Routes>
         </Layout>
       </DndProvider>
