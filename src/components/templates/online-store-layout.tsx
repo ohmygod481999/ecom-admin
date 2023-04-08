@@ -3,11 +3,14 @@ import { Toaster } from "react-hot-toast"
 import Sidebar from "../organisms/sidebar"
 import Topbar from "../organisms/topbar"
 import { PollingProvider } from "../../context/polling"
-import { OnlineStoreSidebar } from "../online-store/sidebar"
+import { OnlineStoreSidebarLeft, OnlineStoreSidebarRight } from "../online-store/sidebar"
+import { OnlineStoreHeader } from "../online-store/header"
+import { EditCodeHeader } from "../online-store/edit-code/header"
+import { EditCodeSidebarLeft } from "../online-store/edit-code/sidebar"
 
 const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
-    <div className="flex w-full h-screen inter-base-regular text-grey-90">
+    <div className="flex flex-col w-full h-screen inter-base-regular text-grey-90">
       <Toaster
         containerStyle={{
           top: 74,
@@ -16,17 +19,42 @@ const OnlineStoreLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
           right: 24,
         }}
       />
-      <OnlineStoreSidebar />
-      <PollingProvider>
-        <div className="flex flex-col flex-1">
-          <Topbar />
-          <div className="">
-            <main className="">
-              {children}
-            </main>
+      <OnlineStoreHeader/>
+      <div className=" flex ">
+
+        <OnlineStoreSidebarLeft />
+        <PollingProvider>
+          <div className="flex flex-col flex-1">
+            <Topbar />
+            <div className="">
+              <main className="">
+                {children}
+              </main>
+            </div>
           </div>
-        </div>
-      </PollingProvider>
+        </PollingProvider>
+        <OnlineStoreSidebarRight/>
+      </div>
+    </div>
+  )
+}
+
+
+export const OnlineStoreEditCodeLayout: React.FC<React.PropsWithChildren> = ({ children }) =>{
+  return (
+    <div className="flex flex-col w-full h-screen">
+      <Toaster
+        containerStyle={{
+          top: 74,
+          left: 24,
+          bottom: 24,
+          right: 24,
+        }}
+      />
+      <EditCodeHeader/>
+      <div className="flex h-full">
+        {children}
+      </div>
     </div>
   )
 }

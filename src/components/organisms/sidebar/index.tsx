@@ -3,6 +3,7 @@ import React, { useState } from "react"
 import CartIcon from "../../fundamentals/icons/cart-icon"
 import CashIcon from "../../fundamentals/icons/cash-icon"
 import EyeIcon from "../../fundamentals/icons/eye-icon"
+import GalleryIcon from "../../fundamentals/icons/gallery-icon/gallery-icon"
 import GearIcon from "../../fundamentals/icons/gear-icon"
 import GiftIcon from "../../fundamentals/icons/gift-icon"
 import SaleIcon from "../../fundamentals/icons/sale-icon"
@@ -79,6 +80,12 @@ const Sidebar: React.FC = () => {
             icon={<CashIcon size={ICON_SIZE} />}
             triggerHandler={triggerHandler}
             text={"Pricing"}
+          />
+          <SidebarMenuItem
+            pageLink={"/a/gallery"}
+            icon={<GalleryIcon size={ICON_SIZE} />}
+            triggerHandler={triggerHandler}
+            text={"Gallery"}
           />
           <SidebarMenuItem
             pageLink={"/online-store"}

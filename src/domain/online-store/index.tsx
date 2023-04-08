@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router-dom"
-import Overview from "./overview"
+import Customtheme from "./custom-theme"
 
 const OnlineStore = () => {
   return (
     <Routes>
-      <Route path="/" element={<Overview />} />
+      <Route path="/" element={<Customtheme />} />
     </Routes>
   )
 }
