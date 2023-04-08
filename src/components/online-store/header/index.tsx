@@ -18,7 +18,7 @@ export const OnlineStoreHeader = () => {
 
   const nextSelectOptions = pages.map((page) => {
     return {
-      label: page.name,
+      label: page.id,
       value: page.path,
       id: page.id,
     }
@@ -30,6 +30,7 @@ export const OnlineStoreHeader = () => {
   }
   const notification = useNotification()
   const save = () => {
+    console.log(121212, currentSections)
     axios
       .put(`http://longvb.net/api-admin/pages/${currentPage.id}`, {
         page_settings: {

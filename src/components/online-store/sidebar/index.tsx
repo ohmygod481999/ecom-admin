@@ -2,28 +2,20 @@ import React, { IframeHTMLAttributes, useEffect, useState } from "react"
 import { useOnlineStore } from "../../../context/online-store"
 import { renderElement } from "./render-element"
 import axios from "axios"
+import { ReactSortable } from "react-sortablejs"
 
 export const OnlineStoreSidebarLeft = (props: {}) => {
-  const { pages, currentPage, setSectionId } = useOnlineStore()
+  const { currentPage, setSectionId, setCurrentSections, currentSections } =
+    useOnlineStore()
   const [sections, setSections] = useState<any>([])
   const [sectionActive, setSectionactive] = useState<string>("")
-  const nextSelectOptions = pages.map((page) => {
-    return {
-      label: page.name,
-      value: page.path,
-      id: page.id,
-    }
-  })
-  const nextSelectCurrentPage = {
-    label: currentPage.name,
-    value: currentPage.path,
-    id: currentPage.id,
-  }
+
   useEffect(() => {
     axios
       .get(`http://longvb.net/api-admin/pages/${currentPage.id}`)
       .then(({ data }) => {
-        setSections(data.page["settings"].sections)
+        const sectionsData: [] = data.page["settings"].sections
+        setCurrentSections(sectionsData)
       })
   }, [currentPage.id])
 
@@ -43,7 +35,6 @@ export const OnlineStoreSidebarLeft = (props: {}) => {
       })
     }
   }
-
   return (
     <div className="w-80">
       <div className="w-full border bg-white px-2 py-3 text-lg font-bold">
@@ -52,22 +43,43 @@ export const OnlineStoreSidebarLeft = (props: {}) => {
       <div>
         <p className="px-4 py-4 text-sm uppercase">sections</p>
         <ul className="overflow-y-scroll pl-1">
-          {sections.map((section) => (
-            <li
-              key={section.id}
-              className={`cursor-pointer px-4 py-1 capitalize ${
-                sectionActive == section.id
-                  ? "rounded-sm border-l-4 border-l-blue-600 bg-green-50"
-                  : ""
-              }`}
-              onClick={(e) => {
-                e.preventDefault()
-                scrollToSection(section.id)
-              }}
-            >
-              {section?.id}
-            </li>
-          ))}
+          <ReactSortable
+            list={currentSections}
+            setList={setCurrentSections}
+            handle=".handle"
+          >
+            {currentSections.map((section) => (
+              <li
+                key={section.id}
+                className={`flex cursor-pointer justify-between px-4 py-1 capitalize ${
+                  sectionActive == section.id
+                    ? "rounded-sm border-l-4 border-l-blue-600 bg-green-50"
+                    : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault()
+                  scrollToSection(section.id)
+                }}
+              >
+                {section?.id}
+                <svg
+                  width="18px"
+                  height="18px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="handle"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M11 19H8V16H11V19Z" fill="#1F2328" />
+                  <path d="M11 13.5H8V10.5H11V13.5Z" fill="#1F2328" />
+                  <path d="M11 8H8V5H11V8Z" fill="#1F2328" />
+                  <path d="M16 19H13V16H16V19Z" fill="#1F2328" />
+                  <path d="M16 13.5H13V10.5H16V13.5Z" fill="#1F2328" />
+                  <path d="M16 8H13V5H16V8Z" fill="#1F2328" />
+                </svg>
+              </li>
+            ))}
+          </ReactSortable>
         </ul>
       </div>
     </div>
@@ -87,18 +99,12 @@ export const OnlineStoreSidebarRight = (props: {}) => {
   const [elements, setElements] = useState({})
   useEffect(() => {
     if (sectionId) {
-      axios
-        .get(`http://longvb.net/api-admin/pages/${currentPage.id}`)
-        .then(({ data }) => {
-          const sectionsData: [] = data.page["settings"].sections
-          setCurrentSections(sectionsData)
-          const section: any = sectionsData.filter(
-            (section: any) => section.id == sectionId
-          )[0]
-          setElements(section.settings["elements"])
-        })
+      const section: any = currentSections.filter(
+        (section: any) => section.id == sectionId
+      )[0]
+      setElements(section.settings["elements"])
     }
-  }, [sectionId])
+  }, [sectionId, currentSections])
   useEffect(() => {
     setInputValue({ elements })
     setCurrentSections((prev) => {
