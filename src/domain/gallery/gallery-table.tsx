@@ -26,17 +26,9 @@ const defaultQueryProps = {
 const GalleryTable = (props) => {
   const { refresh } = props
   const location = useLocation()
-  //   const params = usePriceListFilters(location.search, defaultQueryProps)
   const [columns] = useGalleryListTableColumns()
   const [gallery, setGallery] = useState<GalleryList[]>([])
   const [count, setCount] = useState<number>(0)
-  //   const {
-  //     price_lists,
-  //     isLoading,
-  //     count = 0,
-  //   } = useAdminPriceLists(params.queryObject, {
-  //     keepPreviousData: true,
-  //   })
 
   useEffect(() => {
     axios.get("/api-admin/gallery").then(({ data }) => {
@@ -44,14 +36,6 @@ const GalleryTable = (props) => {
       setCount(data.gallery.length)
     })
   }, [refresh])
-
-  //   useSetSearchParams(params.representationObject)
-
-  const resetFilters = () => {
-    // params.setQuery("")
-    // params.reset()
-  }
-
   return (
     <div>
       <GalleryListTable

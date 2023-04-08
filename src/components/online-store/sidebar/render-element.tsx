@@ -3,6 +3,9 @@ import useNotification from "../../../hooks/use-notification"
 import { ReactSortable } from "react-sortablejs"
 import EditBlockModal, { AddBlockModal } from "../../organisms/blocks-modal"
 import { SelectImageModal } from "../../organisms/image-modal"
+import axios from "axios"
+import EditBlogModal from "../../organisms/blog-modal"
+import EditProductModal from "../../organisms/online-store-modal/product-modal"
 
 export const RenderBlocks = (props) => {
   const { elements, keyValue, handleElement } = props
@@ -242,6 +245,122 @@ export const RenderImage = (props) => {
     </>
   )
 }
+export const RenderBlog = (props) => {
+  const { id, keyValue, handleElement } = props
+
+  const [blog, setBlog] = useState<any>()
+  const [blogs, setBlogs] = useState<any>()
+  const [openModalChangeBlog, setOpenModalChangeBlog] = useState<boolean>(false)
+  useEffect(() => {
+    axios
+      .get("http://longvb.net/api-admin/datasource/blogs")
+      .then(({ data }) => {
+        setBlogs(data.value)
+      })
+  }, [])
+  useEffect(() => {
+    axios
+      .get(`http://longvb.net/api-admin/datasource/blogs?id=${id}`)
+      .then(({ data }) => {
+        setBlog(data.value[0])
+      })
+  }, [id, blogs])
+  return (
+    <>
+      <div className="flex justify-between">
+        <p className="font-extrabold">Blog</p>{" "}
+        <button onClick={() => setOpenModalChangeBlog(true)}>Change</button>
+      </div>
+
+      {blog ? (
+        <div className="rounded bg-slate-100 px-1 py-2">
+          {blog.fields.title}
+          <img src={blog.fields.thumbnail.fields.file.url} alt="" />
+        </div>
+      ) : (
+        <div className="flex h-16 items-center justify-center">
+          <button
+            className="h-fit rounded border bg-white px-2 py-1 hover:bg-slate-100"
+            onClick={() => setOpenModalChangeBlog(true)}
+          >
+            Select Blog
+          </button>
+        </div>
+      )}
+      {openModalChangeBlog ? (
+        <EditBlogModal
+          keyValue={keyValue}
+          blogs={blogs}
+          handleClose={() => {
+            setOpenModalChangeBlog(false)
+          }}
+          selectedBlogId={id}
+          handleElement={handleElement}
+        />
+      ) : (
+        ""
+      )}
+    </>
+  )
+}
+
+export const RenderProduct = (props) => {
+  const { id, keyValue, handleElement } = props
+
+  const [product, setProduct] = useState<any>()
+  const [products, setProducts] = useState<any>()
+  const [openModalChangeProduct, setOpenModalChangeProduct] =
+    useState<boolean>(false)
+  useEffect(() => {
+    axios
+      .get("http://longvb.net/api-admin/datasource/products")
+      .then(({ data }) => {
+        setProducts(data.value)
+      })
+  }, [])
+  useEffect(() => {
+    axios
+      .get(`http://longvb.net/api-admin/datasource/products?id=${id}`)
+      .then(({ data }) => {
+        setProduct(data.value[0])
+      })
+  }, [id])
+  return (
+    <>
+      <div className="flex justify-between">
+        <p className="font-extrabold">{keyValue}</p>
+        <button onClick={() => setOpenModalChangeProduct(true)}>Change</button>
+      </div>
+      {product ? (
+        <div className="rounded bg-slate-100 px-1 py-2">
+          {product.title}
+          <img src={product.thumbnail} alt={keyValue} />
+        </div>
+      ) : (
+        <div className="flex h-16 items-center justify-center">
+          <button
+            className="h-fit rounded border bg-white px-2 py-1 hover:bg-slate-100"
+            onClick={() => setOpenModalChangeProduct(true)}
+          >
+            Select Product
+          </button>
+        </div>
+      )}
+      {openModalChangeProduct ? (
+        <EditProductModal
+          products={products}
+          selectedProductId={product?.id || null}
+          keyValue={keyValue}
+          handleClose={() => setOpenModalChangeProduct(false)}
+          handleElement={handleElement}
+        />
+      ) : (
+        ""
+      )}
+    </>
+  )
+}
+
 export const renderElement = {
   button: {
     render: (elements, key, handleElement) => (
@@ -301,5 +420,26 @@ export const renderElement = {
         />
       </div>
     ),
+  },
+  datasource: {
+    render: (elements, key, handleElement) => {
+      if (elements[key].source == "blog") {
+        return (
+          <RenderBlog
+            id={elements[key].params.id}
+            keyValue={key}
+            handleElement={handleElement}
+          />
+        )
+      } else if (elements[key].source == "product") {
+        return (
+          <RenderProduct
+            id={elements[key].params.id}
+            keyValue={key}
+            handleElement={handleElement}
+          />
+        )
+      }
+    },
   },
 }

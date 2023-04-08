@@ -1,9 +1,7 @@
 import React, { IframeHTMLAttributes, useEffect, useState } from "react"
 import { useOnlineStore } from "../../../context/online-store"
-import { NextSelect } from "../../molecules/select/next-select"
 import { renderElement } from "./render-element"
 import axios from "axios"
-import { ClaimTag } from "@medusajs/medusa"
 
 export const OnlineStoreSidebarLeft = (props: {}) => {
   const { pages, currentPage, setSectionId } = useOnlineStore()
@@ -117,7 +115,6 @@ export const OnlineStoreSidebarRight = (props: {}) => {
       return prev
     })
   }, [elements])
-  console.log("debug", currentSections)
   const handleElement = (e: any, key, keyValue, type) => {
     if (type == "blocks") {
       setElements((prev) => ({
@@ -135,6 +132,14 @@ export const OnlineStoreSidebarRight = (props: {}) => {
           [keyValue]: e,
         },
       }))
+    } else if (type == "datasource") {
+      setElements((prev) => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [keyValue]: { id: e },
+        },
+      }))
     } else {
       setElements((prev) => ({
         ...prev,
@@ -146,13 +151,13 @@ export const OnlineStoreSidebarRight = (props: {}) => {
     }
   }
   return (
-    <div className="w-80">
+    <div className="h-[calc(100vh-56px)] w-80">
       <div className="w-full border bg-white px-2 py-3 text-lg font-bold">
         {currentPage.name}
       </div>
-      <div>
+      <div className="h-full">
         <p className="px-4 py-4 text-sm uppercase">Featured Collection</p>
-        <ul className="overflow-y-scroll pl-1">
+        <ul className="h-[calc(100%-52px)] overflow-y-scroll pl-1">
           {Object.keys(elements).map((key, index) => {
             return (
               <li key={key} className="flex flex-col px-4 py-1 capitalize">
